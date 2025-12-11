@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes App</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: #eef2f3;
+    margin: 0;
+    padding: 0;
+}
+
+.container{
+    width: 90%;
+    max-width: 700px;
+    margin: 40px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+h2{
+    text-align: center;
+}
+
+.input-area{
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+textarea{
+    flex: 1;
+    padding: 10px;
+    height: 80px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button{
+    padding: 10px 15px;
+    border: none;
+    background: #4CAF50;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover{
+    opacity: 0.9;
+}
+
+.search-box{
+    margin-top: 20px;
+}
+
+.search-box input{
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.notes-list{
+    margin-top: 20px;
+}
+
+.note{
+    background: #f7f7f7;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.actions{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.actions button{
+    margin-left: 5px;
+    padding: 5px;
+    font-size: 12px;
+}
+
+.edit-btn{
+    background: #2196F3;
+}
+
+.delete-btn{
+    background: #E53935;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <h2>📝 Notes App</h2>
+
+    <div class="input-area">
+        <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+        <button onclick="addNote()">Add</button>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="search" placeholder="Search notes..." onkeyup="searchNotes()">
+    </div>
+
+    <div id="notes" class="notes-list"></div>
+</div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+displayNotes();
+
+function addNote() {
+    let text = document.getElementById("noteInput").value.trim();
+    if (text === "") return;
+
+    notes.push(text);
+    document.getElementById("noteInput").value = "";
+
+    saveNotes();
+    displayNotes();
+}
+
+function deleteNote(index) {
+    notes.splice(index, 1);
+    saveNotes();
+    displayNotes();
+}
+
+function editNote(index) {
+    let newText = prompt("Edit your note:", notes[index]);
+    if (newText !== null && newText.trim() !== "") {
+        notes[index] = newText.trim();
+        saveNotes();
+        displayNotes();
+    }
+}
+
+function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+}
+
+function displayNotes() {
+    let notesDiv = document.getElementById("notes");
+    notesDiv.innerHTML = "";
+
+    notes.forEach((note, i) => {
+        notesDiv.innerHTML += `
+        <div class="note">
+            <div>${note}</div>
+            <div class="actions">
+                <button class="edit-btn" onclick="editNote(${i})">Edit</button>
+                <button class="delete-btn" onclick="deleteNote(${i})">Delete</button>
+            </div>
+        </div>`;
+    });
+}
+
+function searchNotes() {
+    let query = document.getElementById("search").value.toLowerCase();
+    let notesDiv = document.getElementById("notes");
+
+    notesDiv.innerHTML = "";
+
+    notes.forEach((note, i) => {
+        if (note.toLowerCase().includes(query)) {
+            notesDiv.innerHTML += `
+            <div class="note">
+                <div>${note}</div>
+                <div class="actions">
+                    <button class="edit-btn" onclick="editNote(${i})">Edit</button>
+                    <button class="delete-btn" onclick="deleteNote(${i})">Delete</button>
+                </div>
+            </div>`;
+        }
+    });
+}
+</script>
+
+</body>
+</html>
